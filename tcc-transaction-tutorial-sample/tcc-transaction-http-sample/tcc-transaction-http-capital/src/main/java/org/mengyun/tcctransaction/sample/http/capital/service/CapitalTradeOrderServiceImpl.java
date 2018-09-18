@@ -99,11 +99,9 @@ public class CapitalTradeOrderServiceImpl implements CapitalTradeOrderService {
 
         try {
             Thread.sleep(1000l);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-
-        System.out.println("capital cancel record called. time seq:" + DateFormatUtils.format(Calendar.getInstance(), "yyyy-MM-dd HH:mm:ss"));
+        } catch (InterruptedException e)
+        {System.out.println("capital cancel record called. time seq:" +
+                DateFormatUtils.format(Calendar.getInstance(), "yyyy-MM-dd HH:mm:ss"));
 
         TradeOrder tradeOrder = tradeOrderRepository.findByMerchantOrderNo(tradeOrderDto.getMerchantOrderNo());
 

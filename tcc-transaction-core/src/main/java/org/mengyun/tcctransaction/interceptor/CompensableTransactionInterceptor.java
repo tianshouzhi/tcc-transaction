@@ -43,22 +43,30 @@ public class CompensableTransactionInterceptor {
 
     public Object interceptCompensableMethod(ProceedingJoinPoint pjp) throws Throwable {
 
+        //1 获得目标方法
         Method method = CompensableMethodUtils.getCompensableMethod(pjp);
 
+        //2 解析目标方法上的@Compensable注解
         Compensable compensable = method.getAnnotation(Compensable.class);
-        Propagation propagation = compensable.propagation();
+        Propagation propagation = compensable.propagation();//事务传播
+        boolean asyncConfirm = compensable.asyncConfirm();//异步确认
+        boolean asyncCancel = compensable.asyncCancel();//异步取消
+
+        //3 解析方法参数中的事务上下文
         TransactionContext transactionContext = FactoryBuilder.factoryOf(compensable.transactionContextEditor()).getInstance().get(pjp.getTarget(), method, pjp.getArgs());
 
-        boolean asyncConfirm = compensable.asyncConfirm();
-
-        boolean asyncCancel = compensable.asyncCancel();
-
+        //4 首次调用为false
         boolean isTransactionActive = transactionManager.isTransactionActive();
 
         if (!TransactionUtils.isLegalTransactionContext(isTransactionActive, propagation, transactionContext)) {
             throw new SystemException("no active compensable transaction while propagation is mandatory for method " + method.getName());
         }
 
+        //MethodType主要是考虑事务传播，有以下四个取值
+        // ROOT：client直接调用的目标方法
+        // CONSUMER,
+        // PROVIDER,
+        // NORMAL;
         MethodType methodType = CompensableMethodUtils.calculateMethodType(propagation, isTransactionActive, transactionContext);
 
         switch (methodType) {

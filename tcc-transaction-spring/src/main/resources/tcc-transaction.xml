@@ -12,6 +12,7 @@
     <bean id="transactionConfigurator" class="org.mengyun.tcctransaction.spring.support.SpringTransactionConfigurator"
           init-method="init"/>
 
+    <!--以下2个切面都是针对@Compensable注解生成代理-->
     <bean id="compensableTransactionAspect" class="org.mengyun.tcctransaction.spring.ConfigurableTransactionAspect"
           init-method="init">
         <property name="transactionConfigurator" ref="transactionConfigurator"/>
